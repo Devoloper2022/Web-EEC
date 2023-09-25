@@ -5,6 +5,7 @@
 - Framework: SPRING BOOT  
 - Build pipeline: MAVEN 
 - Database: PostgreSQL
+- ReadMe file for description
 
 ## Installing and Running the Application
 
