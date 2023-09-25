@@ -7,7 +7,7 @@
 - Database: PostgreSQL
 - ReadMe file for description
 
-## Installing and Running the Application
+### Installing and Running the Application
 
 1. Clone the project repository to your computer:
 ```shell
