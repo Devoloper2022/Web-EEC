@@ -3,10 +3,10 @@ package com.example.ntsdesigntest.Service;
 import com.example.ntsdesigntest.CustomTemplates.StorageException;
 import com.example.ntsdesigntest.CustomTemplates.StorageFileNotFoundException;
 import com.example.ntsdesigntest.Domain.FileInfo;
+import com.example.ntsdesigntest.Domain.MyLogger;
 import com.example.ntsdesigntest.Repository.FileRepo;
+import com.example.ntsdesigntest.Repository.LoggerRepo;
 import com.example.ntsdesigntest.dto.DownloadResponse;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
-import org.hibernate.tool.schema.spi.SqlScriptException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
@@ -30,23 +30,21 @@ import org.slf4j.LoggerFactory;
 @Service
 public class FileService {
     private final FileRepo repo;
+    private final LoggerRepo logger;
 
     @Value("${upload.path}")
     private String path;
 
     @Autowired
-    public FileService(FileRepo repo) {
+    public FileService(FileRepo repo, LoggerRepo logger) {
         this.repo = repo;
+        this.logger = logger;
     }
 
     static Logger log = LoggerFactory.getLogger(FileService.class);
 
 
     public void store(MultipartFile file)  {
-        if (file.isEmpty()) {
-            log.error("Failed to store empty file.");
-            throw new StorageException("Failed to store empty file.");
-        }
 
 
         SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
@@ -64,22 +62,19 @@ public class FileService {
             file.transferTo(new File(path+"/"+file.getOriginalFilename()));
             FileInfo info=new FileInfo(file.getOriginalFilename(),date,path);
             repo.save(info);
-            log.info("created");
+            logger.save(new MyLogger(file.getOriginalFilename(), new Date(),"Upload" ));
         } catch (IOException e){
             log.error("File Exist");
             throw new StorageException("File Exist");
-        } catch (Exception e){
-            log.error("File Exist");
-            throw new StorageException("File Exist");
         }
-
     }
 
 
 
     public DownloadResponse getResource(String fileName) throws IOException {
-      FileInfo info=repo.findFileByFileName(fileName).get();
-       if (info==null){
+
+        FileInfo info=repo.findFileByFileName(fileName).get();
+        if (info==null){
             throw new StorageFileNotFoundException("Could not read file: " + fileName);
        }
         Resource resource = loadResource(fileName);
@@ -91,6 +86,7 @@ public class FileService {
        response.setPath(info.getFilePath());
        response.setResource(resource);
 
+        logger.save(new MyLogger(fileName, new Date(),"Download" ));
        return response;
     }
 

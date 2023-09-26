@@ -1,27 +1,23 @@
 package com.example.ntsdesigntest.Controller;
 
 
-import com.example.ntsdesigntest.dto.DownloadResponse;
-import com.example.ntsdesigntest.dto.SocketRequest;
-import com.example.ntsdesigntest.dto.SocketResponse;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import com.example.ntsdesigntest.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.HtmlUtils;
 
+import com.example.ntsdesigntest.dto.DownloadResponse;
 import java.io.IOException;
 
 
 @CrossOrigin
 @RestController
 @RequestMapping("/api/file")
-public class Controller {
+public class fileController {
     @Autowired
     private FileService service;
 
@@ -34,7 +30,7 @@ public class Controller {
     }
 
     @PostMapping("/download")
-    public ResponseEntity<Object> downloadFile(@RequestParam String fileInfo,@RequestParam String fileName ) throws IOException {
+    public ResponseEntity<Object> downloadFile(@RequestParam String fileName ) throws IOException {
         DownloadResponse file=service.getResource(fileName);
 
         return ResponseEntity.ok()

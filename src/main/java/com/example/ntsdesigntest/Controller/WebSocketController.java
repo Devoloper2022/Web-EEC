@@ -1,8 +1,12 @@
 package com.example.ntsdesigntest.Controller;
 
+import com.example.ntsdesigntest.Service.FileService;
+import com.example.ntsdesigntest.Service.LoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.SubProtocolCapable;
 import org.springframework.web.socket.TextMessage;
@@ -17,10 +21,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-
+@Controller
 public class WebSocketController extends TextWebSocketHandler implements SubProtocolCapable {
 
 
+    @Autowired
+    private LoggerService service;
     private static final Logger logger = LoggerFactory.getLogger(WebSocketController.class);
 
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
@@ -47,7 +53,8 @@ public class WebSocketController extends TextWebSocketHandler implements SubProt
         logger.info("Server Scheduled");
         for (WebSocketSession session : sessions) {
             if (session.isOpen()) {
-                String broadcast = "server periodic message " + LocalTime.now();
+                String response=service.getBasicAnalytics();
+                String broadcast = LocalTime.now()+": "+response;
                 logger.info("Server sends: {}", broadcast);
                 session.sendMessage(new TextMessage(broadcast));
             }
